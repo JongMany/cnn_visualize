@@ -4,51 +4,50 @@ import useReadCsv from '../../hooks/useReadCsv';
 type Num3 = [number, number, number];
 type Kernel = [Num3, Num3, Num3];
 const initialKernel: Kernel = [
-  [0, 0, 0],
-  [0, 0, 0],
-  [0, 0, 0],
+  [-1, 0, 1],
+  [-1, 0, 1],
+  [-1, 0, 1],
 ];
 
 export default function Convolution() {
   const [csvData, uploadCsv] = useReadCsv();
   const [imageData, setImageData] = useState<number[][]>([]);
-  const [CNNData, setCNNData] = useState<number[][]>([]);
 
   // 둘이 한 쌍
-  const [kernelText, setKernelText] = useState('');
+  const [kernelText, setKernelText] = useState('-1, 0, 1\n-1, 0, 1\n-1, 0, 1');
   const [kernel, setKernel] = useState<Kernel>(initialKernel);
 
   const performConvolution = () => {
-    for (let i = 0; i < imageData.length-2; i++) {
+    for (let i = 0; i < imageData.length - 2; i++) {
       setTimeout(() => {
         const data = convolution(imageData, i, kernel);
         setImageData((prev) =>
-          prev.map((item, idx) => {
-            if (idx === i) return data;
-            else return item;
-          })
+          prev
+            .map((item, idx) => {
+              if (idx === i) return data;
+              else return item;
+            })
+            .slice(0, imageData.length - 2)
         );
       }, 5);
     }
   };
 
-  console.log(imageData?.length, imageData[0]?.length);
-
   useEffect(() => {
     if (!csvData) return;
 
-    // drawImage
     setImageData(parseCsvToImageData(csvData));
-    setCNNData(parseCsvToImageData(csvData));
   }, [csvData]);
 
   useEffect(() => {
     if (imageData.length === 0) return;
+
     drawImage('originalCanvas', imageData);
   }, [imageData]);
 
   useEffect(() => {
     if (!kernelText.length) return;
+
     setKernel(transformKernel(kernelText));
   }, [kernelText]);
 
@@ -97,7 +96,8 @@ function parseCsvToImageData(csvData: string) {
 
 function transformKernel(str: string) {
   const results: Kernel = initialKernel;
-  const splitArr = str.split(',');
+  const splitArr = str.split(/, |\n/);
+
   for (let i = 0; i < 3; i++) {
     for (let j = 0; j < 3; j++) {
       results[i][j] = parseInt(splitArr[i * 3 + j]) || 0;
