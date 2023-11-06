@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import useReadCsv from '../../hooks/useReadCsv';
 
 type Num3 = [number, number, number];
@@ -13,29 +13,36 @@ export default function Convolution() {
   const [csvData, uploadCsv] = useReadCsv();
   const [imageData, setImageData] = useState<number[][]>([]);
 
+  console.log(imageData);
+
   // 둘이 한 쌍
   const [kernelText, setKernelText] = useState('-1, 0, 1\n-1, 0, 1\n-1, 0, 1');
   const [kernel, setKernel] = useState<Kernel>(initialKernel);
 
   const performConvolution = () => {
-    let cnnData = imageData;
+    let cnnData = imageData.slice(0, imageData.length - 2);
     for (let i = 0; i < imageData.length - 2; i++) {
-      // setTimeout(() => {
-      //   const data = convolution(imageData, i, kernel);
-      //   setImageData((prev) =>
-      //     prev
-      //       .map((item, idx) => {
-      //         if (idx === i) return data;
-      //         else return item;
-      //       })
-      //       .slice(0, imageData.length - 2)
-      //   );
-      // }, 5 * i);
-
       setTimeout(() => {
-        cnnData[i] = convolution(imageData, i, kernel);
-        drawImage('originalCanvas', imageData);
-      }, 5);
+        const data = convolution(imageData, i, kernel);
+
+        setImageData((prev) =>
+          prev
+            .map((item, idx) => {
+              if (idx === i) return data;
+              else return item;
+            })
+            .slice(0, imageData.length - 2)
+        );
+      }, 5 * i);
+      // setTimeout(() => {
+      //   cnnData[i] = convolution(imageData, i, kernel);
+      //   const a = cnnData.map((item, idx) => {
+      //     if (idx <= i) return convolution(imageData, idx, kernel);
+      //     else return item;
+      //   });
+      //   console.log(i);
+      //   drawImage('originalCanvas', a);
+      // }, 5);
     }
   };
 
@@ -114,6 +121,7 @@ function transformKernel(str: string) {
 
 function calc(input: Kernel, filter: Kernel) {
   let results = 0;
+
   for (let i = 0; i < input.length; i++) {
     for (let j = 0; j < input.length; j++) {
       results += input[i][j] * filter[i][j];
@@ -148,7 +156,7 @@ function calc(input: Kernel, filter: Kernel) {
 function convolution(src: number[][], row: number, kernel: Kernel) {
   const results: number[] = new Array(src.length - 2).fill(0);
 
-  for (let j = 0; j < results.length - 2; j++) {
+  for (let j = 0; j < results.length - 1; j++) {
     // console.log(row, src[row][j]);
     const input: Kernel = [
       [src[row][j], src[row][j + 1], src[row][j + 2]],
