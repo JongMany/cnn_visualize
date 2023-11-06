@@ -1,16 +1,11 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 export default function Main() {
-  const navigate = useNavigate();
   return (
     <div>
-      <form>
-        <button onClick={() => {
-          navigate('/convolution')
-        }}>제출</button>
-      </form>
+      <h1>Link</h1>
+      <Link to='/convolution'>HW2</Link>
     </div>
   );
 }
-

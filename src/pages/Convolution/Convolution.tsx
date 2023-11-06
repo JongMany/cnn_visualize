@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
 import useReadCsv from '../../hooks/useReadCsv';
 
 type Num3 = [number, number, number];
@@ -18,25 +18,31 @@ export default function Convolution() {
   const [kernel, setKernel] = useState<Kernel>(initialKernel);
 
   const performConvolution = () => {
+    let cnnData = imageData;
     for (let i = 0; i < imageData.length - 2; i++) {
+      // setTimeout(() => {
+      //   const data = convolution(imageData, i, kernel);
+      //   setImageData((prev) =>
+      //     prev
+      //       .map((item, idx) => {
+      //         if (idx === i) return data;
+      //         else return item;
+      //       })
+      //       .slice(0, imageData.length - 2)
+      //   );
+      // }, 5 * i);
+
       setTimeout(() => {
-        const data = convolution(imageData, i, kernel);
-        setImageData((prev) =>
-          prev
-            .map((item, idx) => {
-              if (idx === i) return data;
-              else return item;
-            })
-            .slice(0, imageData.length - 2)
-        );
+        cnnData[i] = convolution(imageData, i, kernel);
+        drawImage('originalCanvas', imageData);
       }, 5);
     }
   };
 
   useEffect(() => {
     if (!csvData) return;
-
-    setImageData(parseCsvToImageData(csvData));
+    const data = parseCsvToImageData(csvData);
+    setImageData(data);
   }, [csvData]);
 
   useEffect(() => {
@@ -117,6 +123,7 @@ function calc(input: Kernel, filter: Kernel) {
   return results;
 }
 
+// 한 번에 계산하는 CNN 함수
 // function convolution(src: number[][], kernel: Kernel) {
 //   const results: number[][] = new Array(src.length - 2)
 //     .fill(0)
@@ -137,6 +144,7 @@ function calc(input: Kernel, filter: Kernel) {
 //   return results;
 // }
 
+// ROW 별로 계산을 도와주는 CNN 함수
 function convolution(src: number[][], row: number, kernel: Kernel) {
   const results: number[] = new Array(src.length - 2).fill(0);
 
