@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Convolution</title>
+  </head>
+  <body>
+    <h3>Upload Grayscale Image CSV:</h3>
+    <input type="file" id="upload" accept=".csv" />
+    <br />
+    <h3>Enter 3x3 Kernel (comma-separated):</h3>
+    <textarea id="kernel" rows="3" cols="20">
+      -1, 0, 1
+      -1, 0, 1
+      -1, 0, 1
+    </textarea>
+    <br />
+    <button onclick="performConvolution()">Apply Convolution</button>
+    <h3>Image:</h3>
+    <canvas id="originalCanvas"></canvas>
+
+    <script>
+      let imageData;
+
+      document
+        .getElementById("upload")
+        .addEventListener("change", handleFileUpload);
+
+      function handleFileUpload(event) {
+        const file = event.target.files[0];
+        if (file && file.type === "text/csv") {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            const csvData = e.target.result;
+            imageData = parseCsvToImageData(csvData);
+            drawImage("originalCanvas", imageData);
+          };
+          reader.readAsText(file);
+        } else {
+          alert("Please upload a valid CSV file.");
+        }
+      }
+
+      function parseCsvToImageData(csvData) {
+        const rows = csvData.trim().split("\n");
+        return rows.map((row) => row.split(",").map(Number));
+      }
+
+      function drawImage(canvasId, data) {
+        const canvas = document.getElementById(canvasId);
+        const ctx = canvas.getContext("2d");
+        const height = data.length;
+        const width = data[0].length;
+        canvas.width = width;
+        canvas.height = height;
+
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            const pixelValue = data[y][x];
+            ctx.fillStyle = `rgb(${pixelValue}, ${pixelValue}, ${pixelValue})`;
+            ctx.fillRect(x, y, 1, 1);
+          }
+        }
+      }
+
+      // TODO: Implement this function
+      function performConvolution() {
+        alert("TODO: Implement this function");
+      }
+      //
+    </script>
+  </body>
+</html>
