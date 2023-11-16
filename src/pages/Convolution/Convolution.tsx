@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import React, {ChangeEvent, useEffect, useState} from 'react';
 import useReadCsv from '../../hooks/useReadCsv';
 
 type Num3 = [number, number, number];
@@ -13,36 +13,26 @@ export default function Convolution() {
   const [csvData, uploadCsv] = useReadCsv();
   const [imageData, setImageData] = useState<number[][]>([]);
 
-  console.log(imageData);
-
   // 둘이 한 쌍
   const [kernelText, setKernelText] = useState('-1, 0, 1\n-1, 0, 1\n-1, 0, 1');
   const [kernel, setKernel] = useState<Kernel>(initialKernel);
 
   const performConvolution = () => {
-    let cnnData = imageData.slice(0, imageData.length - 2);
+    // let cnnData = imageData.slice(0, imageData.length - 2);
     for (let i = 0; i < imageData.length - 2; i++) {
       setTimeout(() => {
-        const data = convolution(imageData, i, kernel);
+
+        const data = convolution(makePadding(imageData), i, kernel);
 
         setImageData((prev) =>
-          prev
-            .map((item, idx) => {
-              if (idx === i) return data;
-              else return item;
-            })
-            .slice(0, imageData.length - 2)
+            prev
+                .map((item, idx) => {
+                  if (idx === i) return data;
+                  else return item;
+                })
+                .slice(0, imageData.length)
         );
       }, 5 * i);
-      // setTimeout(() => {
-      //   cnnData[i] = convolution(imageData, i, kernel);
-      //   const a = cnnData.map((item, idx) => {
-      //     if (idx <= i) return convolution(imageData, idx, kernel);
-      //     else return item;
-      //   });
-      //   console.log(i);
-      //   drawImage('originalCanvas', a);
-      // }, 5);
     }
   };
 
@@ -80,31 +70,44 @@ export default function Convolution() {
       }
     }
   }
+
   return (
-    <div>
-      <h3>Upload Grayscale Image CSV:</h3>
-      <input type='file' id='upload' accept='.csv' onChange={uploadCsv} />
-      <br />
-      <h3>Enter 3x3 Kernel (comma-separated):</h3>
-      <textarea
-        id='kernel'
-        rows={3}
-        cols={20}
-        value={kernelText}
-        onChange={(e: ChangeEvent<HTMLTextAreaElement>) => {
-          setKernelText(e.target.value);
-        }}
-      ></textarea>
-      <br />
-      <button onClick={performConvolution}>Apply Convolution</button>
-      <h3>Image:</h3>
-      <canvas id='originalCanvas'></canvas>
-    </div>
+      <div>
+        <h3>Upload Grayscale Image CSV:</h3>
+        <input type='file' id='upload' accept='.csv' onChange={uploadCsv}/>
+        <br/>
+        <h3>Enter 3x3 Kernel (comma-separated):</h3>
+        <textarea
+            id='kernel'
+            rows={3}
+            cols={20}
+            value={kernelText}
+            onChange={(e: ChangeEvent<HTMLTextAreaElement>) => {
+              setKernelText(e.target.value);
+            }}
+        ></textarea>
+        <br/>
+        <button onClick={performConvolution}>Apply Convolution</button>
+        <h3>Image:</h3>
+        <canvas id='originalCanvas'></canvas>
+      </div>
   );
 }
+
 function parseCsvToImageData(csvData: string) {
   const rows = csvData.trim().split('\n');
   return rows.map((row) => row.split(',').map(Number));
+}
+
+// padding을 만들어주는 함수
+function makePadding(input: number[][]): number[][] {
+  const results = Array.from(Array(input.length + 2), () => new Array(input[0].length + 2).fill(0));
+  for (let i = 0; i < input.length; i++) {
+    for (let j = 0; j < input[0].length; j++) {
+      results[i + 1][j + 1] = input[i][j] || 0;
+    }
+  }
+  return results;
 }
 
 function transformKernel(str: string) {
@@ -127,7 +130,6 @@ function calc(input: Kernel, filter: Kernel) {
       results += input[i][j] * filter[i][j];
     }
   }
-
   return results;
 }
 
@@ -156,6 +158,7 @@ function calc(input: Kernel, filter: Kernel) {
 function convolution(src: number[][], row: number, kernel: Kernel) {
   const results: number[] = new Array(src.length - 2).fill(0);
 
+
   for (let j = 0; j < results.length - 1; j++) {
     // console.log(row, src[row][j]);
     const input: Kernel = [
@@ -165,6 +168,5 @@ function convolution(src: number[][], row: number, kernel: Kernel) {
     ];
     results[j] = calc(input, kernel);
   }
-
   return results;
 }
