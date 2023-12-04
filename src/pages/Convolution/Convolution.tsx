@@ -175,7 +175,7 @@ function convolutionAll(src: number[][], kernel: Kernel) {
 }
 
 // ROW 별로 계산을 도와주는 CNN 함수
-function convolution(src: number[][], row: number, kernel: Kernel) {
+/* function convolution(src: number[][], row: number, kernel: Kernel) {
   const results: number[] = new Array(src.length - 2).fill(0);
 
   for (let j = 0; j < results.length - 1; j++) {
@@ -188,4 +188,4 @@ function convolution(src: number[][], row: number, kernel: Kernel) {
     results[j] = calc(input, kernel);
   }
   return results;
-}
+} */
