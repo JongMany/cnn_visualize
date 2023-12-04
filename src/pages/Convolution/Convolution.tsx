@@ -18,13 +18,16 @@ export default function Convolution2() {
   const [kernelText, setKernelText] = useState('-1, 0, 1\n-1, 0, 1\n-1, 0, 1');
   const [kernel, setKernel] = useState<Kernel>(initialKernel);
 
+  // CNN 연산 수행
   const performConvolution = () => {
+    // 연산결과
     const result = convolutionAll(makePadding(imageData), kernel);
     for (let i = 0; i < result.length; i++) {
       setTimeout(() => {
         const row = result[i];
         drawImageRow('originalCanvas', row, i);
         if (i === result.length - 1) {
+          // 다 그리고 난 뒤 연산결과 저장하여 계속 CNN 계산을 할 수 있도록
           setImageData(result);
         }
       }, 5 + i);
@@ -38,14 +41,15 @@ export default function Convolution2() {
     setImageData(data);
   }, [csvData]);
 
+  // imageData 상태 변경마다 이미지 canvas에 그려주기
   useEffect(() => {
     if (imageData.length === 0) return;
     drawImage('originalCanvas', imageData);
   }, [imageData]);
 
+  // 커널 텍스트입력마다 kernel 값 저장
   useEffect(() => {
     if (!kernelText.length) return;
-
     setKernel(transformKernel(kernelText));
   }, [kernelText]);
 
@@ -67,6 +71,7 @@ export default function Convolution2() {
     }
   }
 
+  // 행별로 이미지를 그려주는 함수 작성
   function drawImageRow(canvasId: string, rowData: number[], row: number) {
     const canvas = document.getElementById(canvasId) as HTMLCanvasElement;
     const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
