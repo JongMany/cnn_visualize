@@ -24,9 +24,6 @@ export default function Convolution2() {
       setTimeout(() => {
         const row = result[i];
         drawImageRow('originalCanvas', row, i);
-        if (i === result.length - 1) {
-          setImageData(result);
-        }
       }, 5 + i);
     }
   };
